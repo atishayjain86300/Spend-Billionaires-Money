@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spend Billionaires' Money</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2em;
+    }
+    #balance {
+      font-size: 1.5em;
+      margin: 10px 0;
+      color: green;
+    }
+    #items {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .item {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background: white;
+      width: 200px;
+      margin: 10px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .item img {
+      max-width: 100%;
+      height: 100px;
+      object-fit: contain;
+    }
+    button {
+      margin: 5px;
+      padding: 8px 12px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background: #4CAF50;
+      color: white;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    select {
+      padding: 8px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+    #billionaireImage {
+      width: 100px;
+      height: 100px;
+      margin: 10px;
+    }
+    #billionairePreview {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .preview-img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.26/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+  <label for="billionaireSelect">Choose a Billionaire: </label>
+  <select id="billionaireSelect" onchange="changeBillionaire(this.value)">
+    <option value="0">Elon Musk</option>
+    <option value="1">Jeff Bezos</option>
+    <option value="2">Bernard Arnault</option>
+    <option value="3">Bill Gates</option>
+    <option value="4">Larry Ellison</option>
+    <option value="5">Warren Buffett</option>
+    <option value="6">Larry Page</option>
+    <option value="7">Sergey Brin</option>
+    <option value="8">Steve Ballmer</option>
+    <option value="9" selected>Mukesh Ambani</option>
+  </select>
+
+  <label for="userName">Enter your Name: </label>
+  <input type="text" id="userName" placeholder="Your Name" />
+
+  <div id="billionaireInfo">
+    <h1 id="billionaireName">Spend Mukesh Ambani's Money</h1>
+    <div>
+      <img id="billionaireImage" src="https://img.icons8.com/color/100/mukesh-ambani.png" alt="Billionaire" />
+      <p id="countryName">Country: India</p>
+      <img id="countryFlag" src="https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg" alt="India Flag" width="50" height="35"/>
+    </div>
+  </div>
+
+  <div id="balance">$113,000,000,000</div>
+
+  <div id="items"></div>
+
+  <button onclick="generatePDF()">Generate PDF</button>
+
+  <script>
+    const billionaires = [
+  {
+    name: "Elon Musk",
+    netWorth: 180000000000,
+    image: "https://img.icons8.com/?size=100&id=u8UUW8PqdgIB&format=png&color=000000",
+    country: "USA",
+    flag: "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg"
+  },
+  {
+    name: "Jeff Bezos",
+    netWorth: 155000000000,
+    image: "https://img.icons8.com/?size=100&id=41129&format=png&color=000000",
+    country: "USA",
+    flag: "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg"
+  },
+  {
+    name: "Bernard Arnault",
+    netWorth: 194000000000,
+    image: "https://img.icons8.com/?size=100&id=XvI3U8XR5uEG&format=png&color=000000",
+    country: "France",
+    flag: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Flag_of_France.svg"
+  },
+  {
+    name: "Bill Gates",
+    netWorth: 129000000000,
+    image: "https://img.icons8.com/?size=100&id=112334&format=png&color=000000",
+    country: "USA",
+    flag: "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg"
+  },
+  {
+    name: "Larry Ellison",
+    netWorth: 145000000000,
+    image: "https://img.icons8.com/?size=100&id=xcYXXqEbLnyn&format=png&color=000000",
+    country: "USA",
+    flag: "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg"
+  },
+  {
+    name: "Warren Buffett",
+    netWorth: 117000000000,
+    image: "https://w7.pngwing.com/pngs/382/800/png-transparent-man-wearing-eyeglasses-art-warren-buffett-berkshire-hathaway-investment-investor-finance-warren-buffet-face-company-head-thumbnail.png",
+    country: "USA",
+    flag: "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg"
+  },
+  {
+    name: "Larry Page",
+    netWorth: 114000000000,
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAWBDEiGmY6YnJVXlfqzAUvm6m3gYwgKNv3w&usqp=CAU",
+    country: "USA",
+    flag: "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg"
+  },
+  {
+    name: "Sergey Brin",
+    netWorth: 110000000000,
+    image: "https://imageio.forbes.com/specials-images/imageserve/5c7d7c254bbe6f78090d831f/0x0.jpg?format=jpg&crop=2412,2414,x475,y168,safe&height=416&width=416&fit=bounds",
+    country: "USA",
+    flag: "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg"
+  },
+  {
+    name: "Steve Ballmer",
+    netWorth: 104000000000,
+    image: "https://img.icons8.com/?size=100&id=8937&format=png&color=000000",
+    country: "USA",
+    flag: "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg"
+  },
+  {
+  name: "Mukesh Ambani",
+  netWorth: 113000000000,
+  image: "https://www.creativehatti.com/wp-content/uploads/2020/08/Mukesh-Ambani-Indian-Businessman-Vector-Illustration-Medium.jpg",
+  country: "India",
+  flag: "https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg"
+}
+
+];
+
+    const items = [
+      { name: "Big Mac", price: 3.5, image: "https://img.icons8.com/color/100/hamburger.png", count: 0 },
+      { name: "Coke", price: 1.5, image: "https://img.icons8.com/color/100/coca-cola.png", count: 0 },
+      { name: "Air Jordan", price: 180, image: "https://img.icons8.com/?size=100&id=45774&format=png&color=000000.png", count: 0 },
+      { name: "iPad Pro", price: 1700, image: "https://img.icons8.com/color/100/ipad.png", count: 0 },
+      { name: "Cinema Ticket", price: 8.5, image: "https://img.icons8.com/?size=100&id=64580&format=png&color=000000.png", count: 0 },
+      { name: "AirPods Pro", price: 159, image: "https://img.icons8.com/?size=100&id=LwJ17EVqA5Qu&format=png&color=000000.png", count: 0 },
+      { name: "iPhone 14 Pro", price: 1300, image: "https://img.icons8.com/?size=100&id=3EJkibCnndEJ&format=png&color=000000.png", count: 0 },
+      { name: "MacBook Pro", price: 2400, image: "https://img.icons8.com/?size=100&id=58025&format=png&color=000000.png", count: 0 },
+      { name: "House", price: 500000, image: "https://img.icons8.com/color/100/real-estate.png", count: 0 },
+      { name: "Villa", price: 2000000, image: "https://img.icons8.com/?size=100&id=e98ZQ91tuvto&format=png&color=000000.png", count: 0 },
+      { name: "Burj Khalifa", price: 1500000000, image: "https://img.icons8.com/?size=100&id=xuaxePVAVqlg&format=png&color=000000.png", count: 0 },
+      { name: "Taj Mahal", price: 900000000, image: "https://img.icons8.com/color/100/taj-mahal.png", count: 0 },
+      { name: "Red Forest", price: 100000000, image: "https://img.icons8.com/color/100/forest.png", count: 0 },
+      { name: "Airplane", price: 300000000, image: "https://img.icons8.com/color/100/airplane-take-off.png", count: 0 },
+      { name: "Ship", price: 500000000, image: "https://img.icons8.com/color/100/cruise-ship.png", count: 0 },
+      { name: "Private Island", price: 700000000, image: "https://img.icons8.com/color/100/island.png", count: 0 },
+      { name: "Space Experience", price: 1500000000, image: "https://img.icons8.com/color/100/space-shuttle.png", count: 0 },
+      { name: "Helicopter", price: 18000000, image: "https://img.icons8.com/color/100/helicopter.png", count: 0 },
+      { name: "Mona Lisa", price: 850000000, image: "https://img.icons8.com/color/100/portrait.png", count: 0 },
+      { name: "Twitter", price: 44000000000, image: "https://img.icons8.com/color/100/twitter.png", count: 0 },
+      { name: "Rolex", price: 15000, image: "https://img.icons8.com/?size=100&id=A3c04Fnghx1E&format=png&color=000000.png", count: 0 },
+      { name: "Gold Bar", price: 60000, image: "https://img.icons8.com/color/100/gold-bars.png", count: 0 },
+      { name: "Tank", price: 8000000, image: "https://img.icons8.com/color/100/tank.png", count: 0 },
+      { name: "Diamond Ring", price: 250000, image: "https://img.icons8.com/color/100/diamond.png", count: 0 },
+      { name: "Sports Bike", price: 18000, image: "https://img.icons8.com/color/100/motorcycle.png", count: 0 },
+      { name: "Luxury Car", price: 100000, image: "https://img.icons8.com/color/100/sedan.png", count: 0 },
+      { name: "Rolls Royce Phantom", price: 450000, image: "https://img.icons8.com/?size=100&id=17769&format=png&color=000000.png", count: 0 },
+      { name: "Royal Crown", price: 12000000, image: "https://img.icons8.com/color/100/crown.png", count: 0 },
+      { name: "Smart TV", price: 2000, image: "https://img.icons8.com/color/100/tv.png", count: 0 },
+      { name: "Electric Car", price: 50000, image: "https://img.icons8.com/?size=100&id=HJ9U3Tl8MWC7&format=png&color=000000.png", count: 0 },
+      { name: "Luxury Yacht", price: 10000000, image: "https://img.icons8.com/color/100/yacht.png", count: 0 },
+      { name: "Private Jet", price: 20000000, image: "https://img.icons8.com/?size=100&id=ctMvFkRByk6X&format=png&color=000000.png", count: 0 },
+      { name: "Ferrari", price: 250000, image: "https://img.icons8.com/?size=100&id=36720&format=png&color=000000.png", count: 0 },
+      { name: "Lamborghini", price: 350000, image: "https://img.icons8.com/color/100/lamborghini.png", count: 0 },
+      { name: "Gold Plated Phone", price: 100000, image: "https://img.icons8.com/?size=100&id=exlmsQ4lRBCU&format=png&color=000000.png", count: 0 },
+      { name: "Supercomputer", price: 5000000, image: "https://img.icons8.com/?size=100&id=gdpvL0qJo07j&format=png&color=000000.png", count: 0 },
+      { name: "Skyscraper", price: 2000000000, image: "https://img.icons8.com/?size=100&id=KkM6BR9g2DFc&format=png&color=000000.png", count: 0 },
+      { name: "Space Station", price: 30000000000, image: "https://img.icons8.com/?size=100&id=a3qFT8rZNYXI&format=png&color=000000.png", count: 0 }
+    ];
+
+    let currentBalance = billionaires[9].netWorth;
+    const purchaseCounts = Array(items.length).fill(0);
+
+    function updateItems() {
+      const itemsContainer = document.getElementById("items");
+      itemsContainer.innerHTML = '';
+      items.forEach((item, index) => {
+        const itemElement = document.createElement('div');
+        itemElement.classList.add('item');
+        itemElement.innerHTML = `
+          <img src="${item.image}" alt="${item.name}" />
+          <h3>${item.name}</h3>
+          <p>$${item.price.toLocaleString()}</p>
+          <p>Purchased: ${purchaseCounts[index]}</p>
+          <button onclick="buyItem(${index})" ${currentBalance < item.price ? 'disabled' : ''}>Buy</button>
+        `;
+        itemsContainer.appendChild(itemElement);
+      });
+    }
+
+    function buyItem(index) {
+      const item = items[index];
+      if (currentBalance >= item.price) {
+        currentBalance -= item.price;
+        purchaseCounts[index]++;
+        updateBalance();
+        updateItems();
+      }
+    }
+
+    function updateBalance() {
+      document.getElementById("balance").textContent = `$${currentBalance.toLocaleString()}`;
+    }
+
+    function changeBillionaire(index) {
+      const billionaire = billionaires[index];
+      document.getElementById("billionaireName").textContent = `Spend ${billionaire.name}'s Money`;
+      document.getElementById("billionaireImage").src = billionaire.image;
+      document.getElementById("countryName").textContent = `Country: ${billionaire.country}`;
+      document.getElementById("countryFlag").src = billionaire.flag;
+      currentBalance = billionaire.netWorth;
+      purchaseCounts.fill(0);
+      updateBalance();
+      updateItems();
+    }
+
+    function generatePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let totalSpent = 0;
+
+      const userName = document.getElementById("userName").value || "Anonymous";
+
+      doc.setFontSize(18);
+      doc.text(`Billionaire's Spending Report`, 10, 20);
+      doc.setFontSize(12);
+      doc.text(`User: ${userName}`, 10, 30);
+      doc.text(`Billionaire: ${document.getElementById("billionaireName").innerText}`, 10, 40);
+      doc.setFontSize(14);
+
+      const tableData = items
+        .filter(item => purchaseCounts[items.indexOf(item)] > 0)
+        .map(item => {
+          const totalItemPrice = item.price * purchaseCounts[items.indexOf(item)];
+          totalSpent += totalItemPrice;
+          return {
+            item: item.name,
+            count: purchaseCounts[items.indexOf(item)],
+            totalPrice: `$${totalItemPrice.toLocaleString()}`
+          };
+        });
+
+      doc.autoTable({
+        head: [['Item', 'Count', 'Total Cost']],
+        body: tableData.map(item => [item.item, item.count, item.totalPrice]),
+        startY: 50,
+        theme: 'grid',
+        headStyles: { fontSize: 12, halign: 'center' },
+        bodyStyles: { fontSize: 10 }
+      });
+
+      doc.setFontSize(14);
+      doc.text(`Total Spent: $${totalSpent.toLocaleString()}`, 10, doc.lastAutoTable.finalY + 10);
+
+      doc.save(`Spending_Summary_${userName}.pdf`);
+    }
+
+    updateBalance();
+    updateItems();
+  </script>
+
+</body>
+</html>
